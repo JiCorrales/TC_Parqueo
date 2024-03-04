@@ -21,9 +21,20 @@ public class ParkingLot {
         String strValue = "***** PARQUEO *****\n";
         int spotsPerRow = 10;
         // Iterates through the spots and adds them to the string
-        for (int i = 0; i < spots.length; i++) {
+        for (int i = 0; i < 20; i++) {
             strValue += (i + 1) + ". " + spots[i].toString() + "\n";
             if ((i + 1) % spotsPerRow == 0 && i != spots.length - 1) {
+                strValue += "-----------------\n"; // Separator between rows
+            }
+        }
+        for (int i = 20; i < 35; i++) {
+            if (i <=24) {
+                strValue += (i + 1) + ". " + spots[i].toString() + "\n";
+            }
+            else {
+                strValue += "M" + (i - 24) + ". " + spots[i].toString() + "\n";
+            }
+            if ((i + 1) % 35 == 0) {
                 strValue += "-----------------\n"; // Separator between rows
             }
         }

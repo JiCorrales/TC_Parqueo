@@ -103,6 +103,16 @@ public class Vehicles {
     }
     // Método para validar la placa
     public static boolean validPlate(String plate) {
-        return plate.matches("\\d{6}[a-zA-Z]");
+        // La placa debe tener una longitud de 6 caracteres
+        if (plate.length() != 6) {
+            return false;
+        }
+        // La placa debe contener solo letras y números
+        for (char c : plate.toCharArray()) {
+            if (!Character.isLetterOrDigit(c)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
