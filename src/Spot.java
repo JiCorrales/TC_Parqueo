@@ -1,20 +1,40 @@
 import java.util.Date;
 public class Spot {
-//    private int[] spots = new int[];
-    private String spotNumber;
+    private Vehicles vehicle;
     private boolean isOccupied;
 
-    public String getSpotNumber() {
-        return spotNumber;
+    public Spot() {
+        this.vehicle = null;
+        this.isOccupied = false;
     }
-    public void setSpotNumber(String spotNumber) {
-        this.spotNumber = spotNumber;
+    @Override
+    public String toString() {
+        String status = "Libre";
+        if (isOccupied) status = "Ocupado";
+
+        if (vehicle != null)
+            return "Status: " + status + "     " + vehicle.toString();
+        return "Status: " + status;
     }
+    public Vehicles getVehicle() {
+        return vehicle;
+    }
+
+    public void setVehicle(Vehicles vehicle) {
+        this.vehicle = vehicle;
+    }
+
     public boolean isOccupied() {
         return isOccupied;
     }
 
     public void setOccupied(boolean occupied) {
-        isOccupied = occupied;
+        this.isOccupied = occupied;
+    }
+
+    public void occupySpot(Vehicles vehicle) {
+        this.vehicle = vehicle;
+        this.isOccupied = true;
+
     }
 }

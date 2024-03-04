@@ -6,21 +6,15 @@ public class VehicleFlow {
 
     private Date entryTime;
     private Date exitTime;
-    private int amountCharged;
 
-    public void addVehicle() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Ingrese el tipo de vehículo a ingresar (Liviano, Mediano, Largo, Motocicleta, Bicicleta): ");
-        String vehicleType = scanner.nextLine();
-        System.out.println("Ingrese la placa del vehículo: ");
-        String plate = scanner.nextLine();
-        System.out.println();
-        Vehicles vehicle = new Vehicles(vehicleType, plate);
-
-        //    public void duration() {
-        //        long duration = exitTime.getTime() - entryTime.getTime();
-        //        System.out.println("El vehículo estuvo " + duration + " milisegundos en el parqueo");
-        //
-        //    }
+    public VehicleFlow(Vehicles vehicle) {
+        this.vehicle = vehicle;
+        this.entryTime = new Date();
+    }
+    public void setExitTime() {
+        if (exitTime == null)
+            this.exitTime = new Date();
     }
 }
+
+
