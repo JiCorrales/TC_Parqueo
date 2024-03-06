@@ -29,6 +29,6 @@ public class VehicleFlow {
     }
     @Override
     public String toString() {
-        return "VehicleFlow{" + "vehicle=" + vehicle + ", entryTime=" + entryTime + ", exitTime=" + exitTime + '}';
+        return "Data:" + vehicle + ", Entró:" + entryTime;
     }
 }

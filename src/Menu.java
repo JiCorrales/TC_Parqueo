@@ -17,44 +17,49 @@ public class Menu {
     }
 
     public void run() {
-        Scanner scanner = new Scanner(System.in);
-        int option;
-        do {
+        Scanner scanner = new Scanner(System.in); // Create a Scanner object
+        int option; // Variable to store the selected option
+        do { // Loop to keep the menu running
             printMenu();
-            option = scanner.nextInt();
-            switch (option) {
-                case 1:
-                    // parkingLot.getVehicleFlow().addVehicle(); // This line is commented out because the method addVehicle() is not implemented yet,
-                    // and it would cause a compilation error, also the method gotta be static to be called from a static context, but it's not
-                    // what we want to do here, so we will fix this later, because I think we don't need it on a static context
-                    parkingLot.addVehicle();
-                    break;
-                case 2:
-                    parkingLot.searchForVehicle();
-                    break;
-                case 3:
-                    System.out.println("Escriba el tipo de vehículo a sacar (Liviano, Mediano, Largo, Motocicleta, Bicicleta): ");
-                    break;
-                case 4:
-                    // parkingLot.printParkingLotStatus(); // This line is commented out because the method printParkingLotStatus() is not implemented yet,
-                    System.out.println(parkingLot.toString());
-                    break;
-                case 5:
-                    System.out.println("Consultar historial");
-                    parkingLot.printAllVehicleFlow();
-                    break;
-                case 6:
-                    System.out.println("Cierre del día");
-                    break;
-                case 7:
-                    System.out.println("Saliendo...");
-                    break;
-                default:
-                    System.out.println("Opción inválida");
-                    break;
+            // Check if the input is an integer
+            if (scanner.hasNextInt()) {
+                option = scanner.nextInt();
+                switch (option) {
+                    case 1:
+                        parkingLot.addVehicle(); // Call the addVehicle method
+                        break;
+                    case 2:
+                        parkingLot.searchForVehicle(); // Call the searchForVehicle method
+                        break;
+                    case 3:
+                        System.out.println("Escriba el tipo de vehículo a sacar (Liviano, Mediano, Largo, Motocicleta, Bicicleta): ");
+                        parkingLot.exitVehicle();
+                        break;
+                    case 4:
+                        System.out.println(parkingLot.toString());
+                        break;
+                    case 5:
+                        System.out.println("Consultar historial");
+                        parkingLot.printAllVehicleFlow();
+                        break;
+                    case 6:
+                        System.out.println("Cierre del día");
+                        break;
+                    case 7:
+                        System.out.println("Saliendo...");
+                        break;
+                    default:
+                        System.out.println("Opción inválida");
+                        break;
+                }
+            } else {
+                // Cleans the buffer
+                scanner.next();
+                System.out.println("Por favor, ingrese un número válido.");
+                option = 0; // Set the option to 0 to keep the loop running
             }
-
         } while (option != 7);
         scanner.close();
     }
+
 }

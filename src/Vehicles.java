@@ -19,9 +19,9 @@ public class Vehicles {
     @Override
     public String toString() {
         if (type.equals("bicicleta")) {
-            return type + ": " + description + "      espacios: " + spotsNeeded + "  [$" + amountCharged + "]";
+            return type + ": " + description + " Espacios ocupados: " + spotsNeeded + "  Cobro Base:[$" + amountCharged + "]";
         } else {
-            return type + ": " + plate + "      espacios: " + spotsNeeded + "  [$" + amountCharged + "]";
+            return type + ": " + plate + " Espacios ocupados: " + spotsNeeded + "  Cobro base:[$" + amountCharged + "]";
         }
     }
 
