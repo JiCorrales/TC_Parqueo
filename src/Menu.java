@@ -26,10 +26,12 @@ public class Menu {
                 option = scanner.nextInt();
                 switch (option) {
                     case 1:
-                        parkingLot.addVehicle(); // Call the addVehicle method
+                        // Call the addVehicle method
+                        parkingLot.addVehicle();
                         break;
                     case 2:
-                        parkingLot.searchForVehicle(); // Call the searchForVehicle method
+                        // Call the searchForVehicle method
+                        parkingLot.searchForVehicle();
                         break;
                     case 3:
                         System.out.println("Escriba el tipo de vehículo a sacar (Liviano, Mediano, Largo, Motocicleta, Bicicleta): ");

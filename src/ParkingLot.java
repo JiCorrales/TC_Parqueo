@@ -68,6 +68,7 @@ public class ParkingLot {
         String plateOrDescription = scanner.nextLine();
         // Search for the vehicle with the plate or description
         Vehicles vehicle = searchVehiclePlateOrDescription(plateOrDescription);
+        // We have to fix the search because we are missing the bike description search
         if (vehicle != null) {
             System.out.println("Vehículo encontrado: ");
             // Buscar el flujo del vehículo en el arreglo vehicleFlow
