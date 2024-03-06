@@ -16,6 +16,22 @@ public class ParkingLot {
         }
     }
 
+    public Spot[] getSpots() {
+        return spots;
+    }
+
+    public void setSpots(Spot[] spots) {
+        this.spots = spots;
+    }
+
+    public VehicleFlow[] getVehicleFlow() {
+        return vehicleFlow;
+    }
+
+    public void setVehicleFlow(VehicleFlow[] vehicleFlow) {
+        this.vehicleFlow = vehicleFlow;
+    }
+
     @Override
     public String toString() {
         String strValue = "***** PARQUEO *****\n";
@@ -28,10 +44,9 @@ public class ParkingLot {
             }
         }
         for (int i = 20; i < 35; i++) {
-            if (i <=24) {
+            if (i <= 24) {
                 strValue += (i + 1) + ". " + spots[i].toString() + "\n";
-            }
-            else {
+            } else {
                 strValue += "M" + (i - 24) + ". " + spots[i].toString() + "\n";
             }
             if ((i + 1) % 35 == 0) {
@@ -40,15 +55,45 @@ public class ParkingLot {
         }
         return strValue;
     }
+
     // Returns the next empty spot
-    private int nextEmptySpot() {
-        for (int i = 0; i < spots.length; i++) {
-            if (!spots[i].isOccupied()) {
-                return i;
+    private int nextEmptySpot(int spotsNeeded, String type) {
+        if (type.equals("motocicleta") || type.equals("bicicleta")) {
+            // Search for an empty spot in the motorcycle and bicycle rows
+            for (int i = 25; i < spots.length; i++) {
+                if (!spots[i].isOccupied()) {
+                    return i;
+                }
             }
+            return -1; // No empty spots for motorcycles or bicycles
+        } else {
+            // Search for an empty spot in the first and second rows, for all other vehicles
+            for (int i = 0; i < 20; i++) {
+                if (i % 10 + spotsNeeded <= 10 && !spots[i].isOccupied()) {
+                    boolean enoughSpaces = true;
+                    // Check if there are enough empty spots for the vehicle
+                    for (int j = i + 1; j < i + spotsNeeded; j++) {
+                        if (spots[j].isOccupied()) {
+                            enoughSpaces = false;
+                            break;
+                        }
+                    }
+                    if (enoughSpaces) {
+                        return i;
+                    }
+                }
+            }
+            // If there are no empty spots in the first and second rows, search for empty spots in the third row
+            for (int i = 20; i < 24; i++) {
+                if (!spots[i].isOccupied()) {
+                    return i;
+                }
+            }
+            return -1; // No empty spots for the vehicle
         }
-        return -1;
     }
+
+
     // Checks if the placement is valid
     private boolean isValidPlacement(int startSpot, int spotsNeeded) {
         int spotsPerRow = 10;
@@ -65,24 +110,6 @@ public class ParkingLot {
         }
         // Checks if the vehicle fits in the same row
         return true;
-    }
-
-    public boolean assignSpot(Vehicles vehicle) {
-        // Gets the amount of spots needed for the vehicle
-        int spotsNeeded = vehicle.getSpotsNeeded();
-        // Gets the next empty spot
-        int startSpot = nextEmptySpot();
-        // If there is an empty spot and the placement is valid, the vehicle is assigned to the spot
-        if (startSpot != -1 && isValidPlacement(startSpot, spotsNeeded)) {
-            for (int i = startSpot; i < startSpot + spotsNeeded; i++) {
-                spots[i].occupySpot(vehicle);
-            }
-            // Returns true if the vehicle was assigned to a spot
-            return true;
-        } else {
-            // Returns false if the vehicle was not assigned to a spot
-            return false;
-        }
     }
 
 
@@ -111,9 +138,21 @@ public class ParkingLot {
             }
         }
     }
+    public void searchForVehicle(){
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Ingrese la placa del vehículo a buscar: ");
+        String plateOrDescription = scanner.nextLine();
+        // Search for the vehicle with the plate or description
+        Vehicles vehicle = searchVehiclePlateOrDescription(plateOrDescription);
+        if (vehicle != null) {
+            System.out.println("Vehículo encontrado: " + vehicle.toString());
+        } else {
+            System.out.println("Vehículo no encontrado.");
+        }
+
+    }
     private String askForVehicleType() {
         // Asks for the vehicle type
-
         Scanner scanner = new Scanner(System.in);
         System.out.println("Ingrese el tipo de vehículo a ingresar (Liviano, Mediano, Largo, Motocicleta, Bicicleta): ");
         // Reads the vehicle type
@@ -123,7 +162,7 @@ public class ParkingLot {
             return vehicleType;
         } else {
             // If the vehicle type is not valid, a message is printed and null is returned
-            System.out.println("Tipo de vehículo inválido. El vehículo no se agregará al parqueo.");
+            System.out.println("Tipo de vehículo inválido.\nVolviendo al menú...");
             return null;
         }
     }
@@ -140,17 +179,78 @@ public class ParkingLot {
             // If the vehicle type is not bicycle, it asks for the plate
             System.out.println("Ingrese la placa del vehículo: ");
             plateOrDescription = scanner.nextLine();
-            // If the plate is not valid, a message is printed and null is returned
+            // Verifica si la placa es válida
             if (!Vehicles.validPlate(plateOrDescription)) {
                 System.out.println("Placa inválida. El vehículo no se agregará al parqueo.");
                 return null;
             }
+            // Verifica si la placa ya está en uso
+            if (checkDuplicatePlate(plateOrDescription)) {
+                System.out.println("¡Atención! Ya existe un vehículo con esta placa en el parqueo.");
+                return null;
+            }
         }
-        return plateOrDescription;// If the plate or description is valid, it is returned
-
+        return plateOrDescription; // If the plate or description is valid, it is returned
     }
+
     // Creates a vehicle
     private Vehicles createVehicle(String vehicleType, String plateOrDescription) {
         return new Vehicles(vehicleType, plateOrDescription);
     }
+    private Vehicles searchVehiclePlateOrDescription(String plateOrDescription) {
+        // Iterates through the vehicle flow and searches for the vehicle with the plate or description
+        for (int i = 0; i < this.vehicleFlow.length; i++) {
+            if (this.vehicleFlow[i] != null && this.vehicleFlow[i].getVehicle().getPlateOrDescription().equals(plateOrDescription)) {
+                return this.vehicleFlow[i].getVehicle();
+            }
+        }
+        return null;
+    }
+    public boolean assignSpot(Vehicles vehicle) {
+        // Gets the amount of spots needed for the vehicle
+        int spotsNeeded = vehicle.getSpotsNeeded();
+        // Gets the next empty spot
+        String vehicleType = vehicle.getType();
+        int startSpot = nextEmptySpot(spotsNeeded, vehicleType);
+        // If there is an empty spot and the placement is valid, the vehicle is assigned to the spot
+        if (startSpot != -1 && isValidPlacement(startSpot, spotsNeeded)) {
+            for (int i = startSpot; i < startSpot + spotsNeeded; i++) {
+                spots[i].occupySpot(vehicle);
+            }
+            // Adds the vehicle to the vehicle flow
+            VehicleFlow vehicleFlow = new VehicleFlow(vehicle);
+            for (int i = 0; i < this.vehicleFlow.length; i++) {
+                if (this.vehicleFlow[i] == null) {
+                    this.vehicleFlow[i] = vehicleFlow;
+                    break;
+                }
+            }
+            return true;
+        } else {
+            // Returns false if the vehicle was not assigned to a spot
+            return false;
+        }
+    }
+    // Method to check if the plate is duplicated
+    public boolean checkDuplicatePlate(String plate) {
+        for (int i = 0; i < spots.length; i++) {
+            Vehicles vehicle = spots[i].getVehicle();
+            // If the vehicle has the same plate, it returns true
+            if (vehicle != null && vehicle.getPlate() != null && vehicle.getPlate().equalsIgnoreCase(plate)) {
+                return true;
+            }
+        }
+        return false; // Returns false if the plate is not duplicated
+    }
+
+    public void printAllVehicleFlow(){
+        // Iterates through the vehicle flow and prints the vehicles
+        for (int i = 0; i < this.vehicleFlow.length; i++) {
+            if (this.vehicleFlow[i] != null) {
+                System.out.println(this.vehicleFlow[i].toString());
+            }
+        }
+    }
+
 }
+

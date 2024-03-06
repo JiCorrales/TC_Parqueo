@@ -1,6 +1,4 @@
-import java.sql.SQLOutput;
 import java.util.Scanner;
-import java.util.SortedMap;
 
 public class Menu {
     public ParkingLot parkingLot;
@@ -32,16 +30,18 @@ public class Menu {
                     parkingLot.addVehicle();
                     break;
                 case 2:
-                    System.out.println("Escriba el tipo de vehículo a consultar (Liviano, Mediano, Largo, Motocicleta, Bicicleta): ");
+                    parkingLot.searchForVehicle();
                     break;
                 case 3:
                     System.out.println("Escriba el tipo de vehículo a sacar (Liviano, Mediano, Largo, Motocicleta, Bicicleta): ");
                     break;
                 case 4:
-                    System.out.println("Este es el estado actual del parqueo:");
+                    // parkingLot.printParkingLotStatus(); // This line is commented out because the method printParkingLotStatus() is not implemented yet,
+                    System.out.println(parkingLot.toString());
                     break;
                 case 5:
                     System.out.println("Consultar historial");
+                    parkingLot.printAllVehicleFlow();
                     break;
                 case 6:
                     System.out.println("Cierre del día");

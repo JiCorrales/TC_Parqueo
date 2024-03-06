@@ -1,9 +1,7 @@
 import java.util.Date;
-import java.util.Scanner;
 
 public class VehicleFlow {
     private Vehicles vehicle;
-
     private Date entryTime;
     private Date exitTime;
 
@@ -11,10 +9,26 @@ public class VehicleFlow {
         this.vehicle = vehicle;
         this.entryTime = new Date();
     }
+
     public void setExitTime() {
-        if (exitTime == null)
-            this.exitTime = new Date();
+        if (exitTime == null) {
+            exitTime = new Date();
+        }
+    }
+
+    public Date getEntryTime() {
+        return entryTime;
+    }
+
+    public Date getExitTime() {
+        return exitTime;
+    }
+
+    public Vehicles getVehicle() {
+        return vehicle;
+    }
+    @Override
+    public String toString() {
+        return "VehicleFlow{" + "vehicle=" + vehicle + ", entryTime=" + entryTime + ", exitTime=" + exitTime + '}';
     }
 }
-
-

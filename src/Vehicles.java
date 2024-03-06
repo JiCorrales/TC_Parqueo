@@ -62,8 +62,11 @@ public class Vehicles {
         this.amountCharged = amountCharged;
     }
 
+    // Method to validate the vehicle type
     public  static boolean validType(String vehicleType) {
+        // The vehicle type must be one of the following
         String[] validVehicleTypes = {"liviano", "mediano", "largo", "motocicleta", "bicicleta"};
+        // Iterates through the valid vehicle types and returns true if the vehicle type is valid
         for (String validVehicleType : validVehicleTypes) {
             if (vehicleType.equals(validVehicleType)) {
                 return true;
@@ -71,6 +74,9 @@ public class Vehicles {
         }
         return false;
     }
+    // Method to get the amount charged
+    // This should be modified to return the amount charged based on the vehicle type and
+    // the time the vehicle was parked
     public int getAmountCharged() {
         switch (type) {
             case "liviano":
@@ -101,18 +107,28 @@ public class Vehicles {
                 return -1;
         }
     }
-    // Método para validar la placa
+    // Method to validate the license plate
+    // This could be modified in order to be more specific, like
+    // checking that the first 3 characters are letters and the last 3 are digits
     public static boolean validPlate(String plate) {
-        // La placa debe tener una longitud de 6 caracteres
+        // The plate must have 6 characters
         if (plate.length() != 6) {
             return false;
         }
-        // La placa debe contener solo letras y números
+        // The first 6 characters must be digits
         for (char c : plate.toCharArray()) {
             if (!Character.isLetterOrDigit(c)) {
                 return false;
             }
         }
         return true;
+    }
+
+    public Object getPlateOrDescription() {
+        if (type.equals("bicicleta")) {
+            return description;
+        } else {
+            return plate;
+        }
     }
 }
