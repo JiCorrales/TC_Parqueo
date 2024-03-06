@@ -50,17 +50,15 @@ public class ParkingLot {
             if (plateOrDescription != null) {
                 // Creates the vehicle
                 Vehicles newVehicle = createVehicle(vehicleType, plateOrDescription);
-                // If the vehicle was created
-                if (newVehicle != null) {
-                    // Assigns the vehicle to a spot
-                    if (assignSpot(newVehicle)) {
-                        // Prints a message if the vehicle was assigned to a spot
-                        System.out.println("Vehículo agregado al parqueo.");
-                    } else {
-                        // Prints a message if the vehicle was not assigned to a spot
-                        System.out.println("No hay espacio disponible para este tipo de vehículo.");
-                    }
+                // Assigns the vehicle to a spot
+                if (assignSpot(newVehicle)) {
+                    // Prints a message if the vehicle was assigned to a spot
+                    System.out.println("Vehículo agregado al parqueo.");
+                } else {
+                    // Prints a message if the vehicle was not assigned to a spot
+                    System.out.println("No hay espacio disponible para este tipo de vehículo.");
                 }
+
             }
         }
     }
