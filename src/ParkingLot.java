@@ -50,15 +50,17 @@ public class ParkingLot {
             if (plateOrDescription != null) {
                 // Creates the vehicle
                 Vehicles newVehicle = createVehicle(vehicleType, plateOrDescription);
-                // Assigns the vehicle to a spot
-                if (assignSpot(newVehicle)) {
-                    // Prints a message if the vehicle was assigned to a spot
-                    System.out.println("Vehículo agregado al parqueo.");
-                } else {
-                    // Prints a message if the vehicle was not assigned to a spot
-                    System.out.println("No hay espacio disponible para este tipo de vehículo.");
+                String entryDate = askForEntryDate();
+                if (entryDate != null) {
+                    // Assigns the vehicle to a spot
+                    if (assignSpot(newVehicle)) {
+                        // Prints a message if the vehicle was assigned to a spot
+                        System.out.println("Vehículo agregado al parqueo.");
+                    } else {
+                        // Prints a message if the vehicle was not assigned to a spot
+                        System.out.println("No hay espacio disponible para este tipo de vehículo.");
+                    }
                 }
-
             }
         }
     }
@@ -186,6 +188,21 @@ public class ParkingLot {
         }
         return null;
     }
+    private String askForEntryDate(){
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Ingrese la fecha de entrada del vehículo: ");
+        String entryDate = scanner.nextLine();
+        if (entryDate != null) {
+            return isValidDate(entryDate) ? entryDate : null;
+        } else {
+            System.out.println("Fecha inválida.\nVolviendo al menú...");
+            return null;
+        }
+    }
+    public static boolean isValidDate(String date){
+        return date.matches("\\d{4}-\\d{2}-\\d{2}");
+    }
+
     // Creates a vehicle
     private Vehicles createVehicle(String vehicleType, String plateOrDescription) {
         return new Vehicles(vehicleType, plateOrDescription);

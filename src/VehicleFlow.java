@@ -1,34 +1,43 @@
-import java.util.Date;
-
 public class VehicleFlow {
+
     private Vehicles vehicle;
-    private Date entryTime;
-    private Date exitTime;
+
+    private String entryDate;
+    private String exitDate;
 
     public VehicleFlow(Vehicles vehicle) {
         this.vehicle = vehicle;
-        this.entryTime = new Date();
+        this.entryDate = entryDate;
     }
 
-    public void setExitTime() {
-        if (exitTime == null) {
-            exitTime = new Date();
-        }
+
+
+    public String getEntryDate() {
+        return entryDate;
     }
 
-    public Date getEntryTime() {
-        return entryTime;
+    public void setEntryDate(String entryDate) {
+        this.entryDate = entryDate;
     }
 
-    public Date getExitTime() {
-        return exitTime;
+    public String getExitDate() {
+        return exitDate;
     }
+
+    public void setExitDate(String exitDate) {
+        this.exitDate = exitDate;
+    }
+
+
 
     public Vehicles getVehicle() {
         return vehicle;
     }
+
+
+
     @Override
     public String toString() {
-        return "Data:" + vehicle + ", Entró:" + entryTime;
+        return "Data:" + vehicle + ", Entró:" + entryDate;
     }
 }
