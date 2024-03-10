@@ -30,11 +30,10 @@ public class Menu {
                         parkingLot.addVehicle();
                         break;
                     case 2:
-                        // Call the searchForVehicle method
+                        // Call the searchForVehicle methodparkingLot.searchForVehicle();
                         parkingLot.searchForVehicle();
                         break;
                     case 3:
-                        System.out.println("Escriba el tipo de vehículo a sacar (Liviano, Mediano, Largo, Motocicleta, Bicicleta): ");
                         parkingLot.exitVehicle();
                         break;
                     case 4:

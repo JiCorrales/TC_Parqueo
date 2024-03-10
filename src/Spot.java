@@ -13,7 +13,7 @@ public class Spot {
         if (isOccupied) status = "Ocupado";
 
         if (vehicle != null)
-            return "Status: " + status + "     " + vehicle.toString();
+            return "Status: " + status + " " + vehicle;
         return "Status: " + status;
     }
     public Vehicles getVehicle() {

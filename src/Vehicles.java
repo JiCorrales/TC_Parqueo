@@ -1,9 +1,13 @@
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
 public class Vehicles {
     private String type;
     private String plate;
     private String description;
     private int spotsNeeded;
     private int amountCharged;
+
 
     public Vehicles(String type, String plateOrDescription) {
         this.type = type;
@@ -19,9 +23,9 @@ public class Vehicles {
     @Override
     public String toString() {
         if (type.equals("bicicleta")) {
-            return type + ": " + description + " Espacios ocupados: " + spotsNeeded + "  Cobro Base:[$" + amountCharged + "]";
+            return "Tipo: " + type + ", Descripción: " + description + ", Espacios: " + spotsNeeded + ", Cobro Base:[$" + amountCharged + "]";
         } else {
-            return type + ": " + plate + " Espacios ocupados: " + spotsNeeded + "  Cobro base:[$" + amountCharged + "]";
+            return "Tipo: " + type + ", Placa: " + plate + ", Espacios: " + spotsNeeded + ", Cobro Base:[$" + amountCharged + "]";
         }
     }
 
@@ -54,18 +58,11 @@ public class Vehicles {
         return spotsNeeded;
     }
 
-    public void setSpotsNeeded(int spotsNeeded) {
-        this.spotsNeeded = spotsNeeded;
-    }
-
-    public void setAmountCharged(int amountCharged) {
-        this.amountCharged = amountCharged;
-    }
 
     // Method to validate the vehicle type
     public  static boolean validType(String vehicleType) {
         // The vehicle type must be one of the following
-        String[] validVehicleTypes = {"liviano", "mediano", "largo", "motocicleta", "bicicleta"};
+        String[] validVehicleTypes = {"liviano", "mediano", "largo", "microbus", "bus", "motocicleta", "bicicleta"};
         // Iterates through the valid vehicle types and returns true if the vehicle type is valid
         for (String validVehicleType : validVehicleTypes) {
             if (vehicleType.equals(validVehicleType)) {
@@ -85,6 +82,10 @@ public class Vehicles {
                 return 2000;
             case "largo":
                 return 3000;
+            case "microbus":
+                return 4000;
+            case "bus":
+                return 5000;
             case "motocicleta":
             case "bicicleta":
                 return 800;
@@ -92,6 +93,24 @@ public class Vehicles {
                 return -1;
         }
     }
+    public int amountToCharge(double hours) {
+        int hourlyRate = getAmountCharged(); // Obtiene la tarifa por hora según el tipo de vehículo
+        if (hourlyRate == -1) {
+            // Tipo de vehículo no válido
+            return -1;
+        }
+
+        // Calcular el monto a cobrar
+        int totalAmount = 0;
+        // Si la fracción de horas es mayor que 0.5, se redondea al siguiente número entero
+        if (hours - Math.floor(hours) > 0.5) {
+            totalAmount = (int) Math.ceil(hours) * hourlyRate;
+        } else {
+            totalAmount = (int) Math.floor(hours) * hourlyRate + hourlyRate / 2;
+        }
+        return totalAmount;
+    }
+
     public int spotsNeeded() {
         switch (type) {
             case "liviano":
@@ -102,6 +121,10 @@ public class Vehicles {
                 return 2;
             case "largo":
                 return 3;
+            case "microbus":
+                return 4;
+            case "bus":
+                return 5;
 
             default:
                 return -1;
@@ -124,7 +147,7 @@ public class Vehicles {
         return true;
     }
 
-    public Object getPlateOrDescription() {
+    public String getPlateOrDescription() {
         if (type.equals("bicicleta")) {
             return description;
         } else {
