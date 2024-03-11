@@ -76,6 +76,9 @@ public class Vehicles {
     // the time the vehicle was parked
     public int getAmountCharged() {
         switch (type) {
+            case "motocicleta":
+            case "bicicleta":
+                return 800;
             case "liviano":
                 return 1000;
             case "mediano":
@@ -86,30 +89,12 @@ public class Vehicles {
                 return 4000;
             case "bus":
                 return 5000;
-            case "motocicleta":
-            case "bicicleta":
-                return 800;
+
             default:
                 return -1;
         }
     }
-    public int amountToCharge(double hours) {
-        int hourlyRate = getAmountCharged(); // Obtiene la tarifa por hora según el tipo de vehículo
-        if (hourlyRate == -1) {
-            // Tipo de vehículo no válido
-            return -1;
-        }
 
-        // Calcular el monto a cobrar
-        int totalAmount = 0;
-        // Si la fracción de horas es mayor que 0.5, se redondea al siguiente número entero
-        if (hours - Math.floor(hours) > 0.5) {
-            totalAmount = (int) Math.ceil(hours) * hourlyRate;
-        } else {
-            totalAmount = (int) Math.floor(hours) * hourlyRate + hourlyRate / 2;
-        }
-        return totalAmount;
-    }
 
     public int spotsNeeded() {
         switch (type) {

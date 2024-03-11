@@ -2,11 +2,10 @@ import java.time.LocalDateTime;
 import java.util.Scanner;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.time.Duration;
 
 public class ParkingLot {
-    private Spot[] spots;
-    private VehicleFlow[] vehicleFlow;
+    private final Spot[] spots;
+    private final VehicleFlow[] vehicleFlow;
     public ParkingLot() {
         // Starts with 35 spots
         this.spots = new Spot[35];
@@ -77,7 +76,8 @@ public class ParkingLot {
                 System.out.println("Ingrese la descripción de la bicicleta: ");
                 plateOrDescription = scanner.nextLine();
             } else { // If the vehicle type is not bicycle, it asks for the plate
-                System.out.println("Ingrese la placa del vehículo: ");
+                System.out.println("Recuerde que la placa debe tener 6 dígitos, pueden ser números o letras.\n" +
+                        "Ingrese la placa del vehículo: ");
                 plateOrDescription = scanner.nextLine();
                 if (!Vehicles.validPlate(plateOrDescription)) {
                     System.out.println("Placa inválida. Por favor, ingrese una placa válida.");
@@ -93,6 +93,106 @@ public class ParkingLot {
 
         return plateOrDescription; // Si la placa o la descripción son válidas, se retorna
     }
+    private Vehicles searchVehicleByPlate(String plate) {
+        for (Spot spot : spots) {
+            Vehicles vehicle = spot.getVehicle();
+            if (vehicle != null && vehicle.getPlate().equalsIgnoreCase(plate)) {
+                return vehicle;
+            }
+        }
+        return null;
+    }
+    public boolean checkDuplicatePlate(String plate) {
+        // Method to check if the plate is duplicated
+        for (Spot spot : spots) {
+            Vehicles vehicle = spot.getVehicle();
+            // If the vehicle has the same plate, it returns true
+            if (vehicle != null && vehicle.getPlate() != null && vehicle.getPlate().equalsIgnoreCase(plate)) {
+                return true;
+            }
+        }
+        return false; // Returns false if the plate is not duplicated
+    }
+
+    public void searchForVehicle() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Ingrese la placa o descripción del vehículo a buscar: ");
+        String plateOrDescription = scanner.nextLine();
+        Vehicles[] matchingVehicles = searchVehiclesByPlateOrDescription(plateOrDescription);
+        if (matchingVehicles.length > 0) {
+            System.out.println("Vehículos encontrados: ");
+            for (Vehicles vehicle : matchingVehicles) {
+                System.out.println("Información del vehículo:");
+                System.out.println(vehicle);
+                VehicleFlow flow = getVehicleFlowForVehicle(vehicle);
+                if (flow != null) {
+                    System.out.println("Cantidad de horas al momento: " + String.format("%.1f", flow.calculateHoursPassed()));
+
+                    // Calcular el monto cobrado hasta el momento utilizando amountToCharge
+                    double amountCharged = amountToCharge(flow.calculateHoursPassed(), flow);
+                    if (amountCharged != -1) {
+                        System.out.println("Monto hasta el momento: $" + amountCharged);
+                    } else {
+                        System.out.println("Tipo de vehículo no válido. No se puede calcular el monto.");
+                    }
+                } else {
+                    System.out.println("No se pudo obtener el flujo de vehículos para el vehículo.");
+                }
+            }
+        } else {
+            System.out.println("Vehículo no encontrado.");
+        }
+    }
+
+    // Método para obtener el flujo de vehículos correspondiente a un vehículo
+    private VehicleFlow getVehicleFlowForVehicle(Vehicles vehicle) {
+        for (VehicleFlow flow : vehicleFlow) {
+            if (flow != null && flow.getVehicle().equals(vehicle)) {
+                return flow;
+            }
+        }
+        return null;
+    }
+    private Vehicles[] searchVehiclesByPlateOrDescription(String plateOrDescription) {
+        // Creamos un array para almacenar los vehículos coincidentes
+        Vehicles[] matchingVehicles = new Vehicles[vehicleFlow.length];
+        int count = 0;
+
+        // Itera a través del flujo de vehículos y busca vehículos con placa o descripción coincidentes
+        for (VehicleFlow flow : this.vehicleFlow) {
+            if (flow != null && flow.getVehicle() != null) {
+                Vehicles vehicle = flow.getVehicle();
+                if (vehicle.getPlateOrDescription().equalsIgnoreCase(plateOrDescription)) {
+                    matchingVehicles[count++] = vehicle;
+                } else if (vehicle.getType().equalsIgnoreCase("bicicleta") && vehicle.getDescription().contains(plateOrDescription)) {
+                    matchingVehicles[count++] = vehicle;
+                }
+            }
+        }
+        // Creamos un nuevo array con el tamaño exacto para almacenar solo los vehículos coincidentes
+        Vehicles[] result = new Vehicles[count];
+        System.arraycopy(matchingVehicles, 0, result, 0, count);
+        return result;
+    }
+
+
+    // exitVehicle method needs work
+    public void exitVehicle() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("¿Desea sacar un vehículo por placa o por campo?");
+        System.out.println("1. Por placa");
+        System.out.println("2. Por campo");
+        int option = scanner.nextInt();
+        scanner.nextLine();
+        if (option == 1) {
+            exitVehicleByPlate(); // Exit vehicle by plate
+        } else if (option == 2) {
+            exitVehicleBySpot(); // Exit vehicle by spot
+        } else {
+            System.out.println("Opción inválida. Volviendo al menú principal.");
+        }
+    }
+
     public void exitVehicleByPlate() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Ingrese la placa del vehículo a sacar: ");
@@ -124,124 +224,6 @@ public class ParkingLot {
             System.out.println("El campo está vacío.");
         }
     }
-    private Vehicles searchVehicleByPlate(String plate) {
-        for (Spot spot : spots) {
-            Vehicles vehicle = spot.getVehicle();
-            if (vehicle != null && vehicle.getPlate().equalsIgnoreCase(plate)) {
-                return vehicle;
-            }
-        }
-        return null;
-    }
-    public boolean checkDuplicatePlate(String plate) {
-        // Method to check if the plate is duplicated
-        for (Spot spot : spots) {
-            Vehicles vehicle = spot.getVehicle();
-            // If the vehicle has the same plate, it returns true
-            if (vehicle != null && vehicle.getPlate() != null && vehicle.getPlate().equalsIgnoreCase(plate)) {
-                return true;
-            }
-        }
-        return false; // Returns false if the plate is not duplicated
-    }
-
-    public void searchForVehicle() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Ingrese la placa o descripción del vehículo a buscar: ");
-        String plateOrDescription = scanner.nextLine();
-
-        // Search for vehicles with the plate or description
-        Vehicles[] matchingVehicles = searchVehiclesByPlateOrDescription(plateOrDescription);
-
-        if (matchingVehicles.length > 0) {
-            System.out.println("Vehículos encontrados: ");
-            for (Vehicles vehicle : matchingVehicles) {
-                System.out.println("Información del vehículo:");
-                System.out.println(vehicle);
-
-                // Get the entry time from the vehicle flow
-                LocalDateTime entryTime = getEntryTimeFromVehicleFlow(vehicle);
-
-                // Calculate the hours elapsed since entry
-                if (entryTime != null) {
-                    LocalDateTime currentTime = LocalDateTime.now();
-                    long hours = Duration.between(entryTime, currentTime).toHours();
-                    System.out.println("Cantidad de horas al momento: " + hours);
-
-                    // Calculate the amount charged until now
-                    int amountChargedPerHour = vehicle.getAmountCharged();
-                    int amountCharged = (int) (hours * amountChargedPerHour);
-                    System.out.println("Monto hasta el momento: $" + amountCharged);
-                } else {
-                    System.out.println("No se pudo obtener la hora de entrada del vehículo.");
-                }
-            }
-        } else {
-            System.out.println("Vehículo no encontrado.");
-        }
-    }
-
-    private LocalDateTime getEntryTimeFromVehicleFlow(Vehicles vehicle) {
-        for (VehicleFlow flow : vehicleFlow) {
-            if (flow != null && flow.getVehicle().equals(vehicle)) {
-                String entryDateTime = flow.getEntryDate();
-                if (isValidDateTime(entryDateTime)) {
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-                    return LocalDateTime.parse(entryDateTime, formatter);
-                }
-            }
-        }
-        return null;
-    }
-
-    private Vehicles[] searchVehiclesByPlateOrDescription(String plateOrDescription) {
-        // Creamos un array para almacenar los vehículos coincidentes
-        Vehicles[] matchingVehicles = new Vehicles[vehicleFlow.length];
-        int count = 0;
-
-        // Itera a través del flujo de vehículos y busca vehículos con placa o descripción coincidentes
-        for (VehicleFlow flow : this.vehicleFlow) {
-            if (flow != null && flow.getVehicle() != null) {
-                Vehicles vehicle = flow.getVehicle();
-                if (vehicle.getPlateOrDescription().equalsIgnoreCase(plateOrDescription)) {
-                    matchingVehicles[count++] = vehicle;
-                } else if (vehicle.getType().equalsIgnoreCase("bicicleta") && vehicle.getDescription().contains(plateOrDescription)) {
-                    matchingVehicles[count++] = vehicle;
-                }
-            }
-        }
-        // Creamos un nuevo array con el tamaño exacto para almacenar solo los vehículos coincidentes
-        Vehicles[] result = new Vehicles[count];
-        System.arraycopy(matchingVehicles, 0, result, 0, count);
-        return result;
-    }
-
-
-    // exitVehicle method needs work
-    public void exitVehicle() {
-        Scanner scanner = new Scanner(System.in);
-
-        // Preguntar al usuario si desea sacar el vehículo por placa o por campo
-        System.out.println("¿Desea sacar un vehículo por placa o por campo?");
-        System.out.println("1. Por placa");
-        System.out.println("2. Por campo");
-
-        // Leer la opción del usuario
-        int option = scanner.nextInt();
-        scanner.nextLine(); // Consumir la nueva línea pendiente después de nextInt()
-
-        // Realizar la salida del vehículo según la opción seleccionada
-        if (option == 1) {
-            // Sacar vehículo por placa
-            exitVehicleByPlate();
-        } else if (option == 2) {
-            // Sacar vehículo por campo
-            exitVehicleBySpot();
-        } else {
-            System.out.println("Opción inválida. Volviendo al menú principal.");
-        }
-    }
-
     private int nextEmptySpot(int spotsNeeded, String type) {
         if (type.equals("motocicleta") || type.equals("bicicleta")) { // If the vehicle is a motorcycle or bicycle
             for (int i = 25; i < spots.length; i++) { // Search for an empty spot in i = 25 to i = 34
@@ -317,7 +299,7 @@ public class ParkingLot {
     private Vehicles createVehicle(String vehicleType, String plateOrDescription) {
         return new Vehicles(vehicleType, plateOrDescription);
     }
-    public boolean assignSpot(Vehicles vehicle, String entryDate){
+    public boolean assignSpot(Vehicles vehicle, String entryDate) {
         int spotsNeeded = vehicle.getSpotsNeeded(); // Gets the amount of spots needed for the vehicle
         String vehicleType = vehicle.getType();  // Gets the next empty spot
         int startSpot = nextEmptySpot(spotsNeeded, vehicleType); // Gets the next empty spot
@@ -339,9 +321,10 @@ public class ParkingLot {
         }
     }
     public void removeVehicle(Vehicles vehicle) {
-        for (int i = 0; i < vehicleFlow.length; i++) {
-            if (vehicleFlow[i] != null && vehicleFlow[i].getVehicle().equals(vehicle)) {
-                vehicleFlow[i].setExitDateTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+        for (VehicleFlow flow : vehicleFlow) {
+            if (flow != null && flow.getVehicle().equals(vehicle)) {
+                flow.setExitDateTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+                System.out.println("Vehículo: " + vehicle + ", Hora Entrada: " + flow.getEntryDate() + ", Hora Salida: " + flow.getExitDateTime() + ", Horas transcurridas: " + String.format("%.1f", flow.calculateHoursPassed()) + ", Monto a cobrar: $" + amountToCharge(flow.calculateHoursPassed(), flow));
                 break;
             }
         }
@@ -352,10 +335,39 @@ public class ParkingLot {
             }
         }
     }
-    public void printAllVehicleFlow(){
+    public int amountToCharge(double hours, VehicleFlow vehicleFlow) {
+        Vehicles vehicle = vehicleFlow.getVehicle(); // Obtener el vehículo asociado a este flujo
+        int hourlyRate = vehicle.getAmountCharged(); // Obtener la tarifa por hora del vehículo
+        System.out.println("Tarifa por hora: " + hourlyRate);
+        if (hourlyRate == -1) {
+            // Tipo de vehículo no válido
+            return -1;
+        }
+
+        // Calcular las horas completas y la fracción de horas
+        int fullHours = (int) Math.floor(hours);
+        double fractionOfHour = hours - fullHours;
+        System.out.println("Horas completas: " + fullHours);
+        System.out.println("Fracción de hora: " + fractionOfHour);
+        // Calcular el monto a cobrar
+        int totalAmount = 0;
+
+        // Si la fracción de horas es menor o igual a 0.5, se cobrará la mitad de la tarifa por hora
+        if (fractionOfHour <= 0.5) {
+            totalAmount = (int) Math.ceil(hours) * (hourlyRate / 2);
+            System.out.println("Monto a cobrar: " + totalAmount);
+        } else {
+            // Si la fracción de horas es mayor que 0.5, se redondea al próximo número entero y se cobra la tarifa completa
+            totalAmount = (int) Math.ceil(hours) * hourlyRate;
+
+        }
+
+        return totalAmount;
+    }
+    public void printAllVehicleFlow() {
         for (VehicleFlow flow : this.vehicleFlow) {
             if (flow != null) {
-                System.out.println(flow.toString());
+                System.out.println(flow);
             }
         }
     }

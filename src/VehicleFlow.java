@@ -28,45 +28,18 @@ public class VehicleFlow {
         return exitDateTime;
     }
 
-    public double calculateHoursParked() {
-        if (exitDateTime != null) {
-            // Calcular la cantidad de horas estacionado utilizando la fecha y hora de entrada y salida
-            // Aquí implementarías la lógica para calcular la diferencia de tiempo
-            return 0; // Solo un marcador de posición
-        } else {
-            return -1; // Indica que el vehículo aún está estacionado
-        }
-    }
-
-    public int calculateAmountToPay() {
-        double hoursParked = calculateHoursParked();
-        if (hoursParked >= 0) {
-            // Calcular el monto a pagar en función de la cantidad de horas estacionado
-            // Aquí implementarías la lógica para calcular el monto
-            return 0; // Solo un marcador de posición
-        } else {
-            return -1; // El vehículo aún está estacionado, no se puede calcular el monto
-        }
-    }
-
-    public double timePassed() {
+    public double calculateHoursPassed() {
         LocalDateTime entryTime = LocalDateTime.parse(entryDateTime, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
         LocalDateTime currentTime = LocalDateTime.now();
-
-        // Calcula la duración entre la entrada y el tiempo actual
         Duration duration = Duration.between(entryTime, currentTime);
-
-        // Obtiene el número total de minutos transcurridos
         long minutesPassed = duration.toMinutes();
-
-        // Calcula el número de horas completas y la fracción de hora
-        double hoursPassed = minutesPassed / 60.0;
-
-        return hoursPassed;
+        return minutesPassed / 60.0;
     }
     @Override
     public String toString() {
-        return "Vehicle: " + vehicle + ", Hora Entrada: " + entryDateTime + ", Horas transcurridas: " + timePassed() + ", Hora salida: " + exitDateTime;
+        double hoursPassed = calculateHoursPassed();
+        String hoursPassedString = String.format("%.1f", hoursPassed);
+        return "Vehículo: " + vehicle + ", Hora Entrada: " + entryDateTime + ", Horas transcurridas: " + hoursPassedString + ", Hora salida: " + exitDateTime;
     }
-
 }
+
