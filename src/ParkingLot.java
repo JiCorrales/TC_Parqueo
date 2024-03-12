@@ -359,6 +359,19 @@ public class ParkingLot {
             }
         }
     }
-
+    public void closeParking(Vehicles[] vehicles) {
+        for (Vehicles vehicle : vehicles) {
+            if (vehicle != null) {
+                LocalDateTime entryTime = getEntryTimeFromVehicleFlow(vehicle);
+                if (entryTime != null) {
+                    LocalDateTime exitTime = LocalDateTime.now();
+                    long hoursParked = ChronoUnit.HOURS.between(entryTime, exitTime);
+                    double hourlyRate = vehicle.getAmountCharged();
+                    double amountToCharge = hoursParked * hourlyRate;
+                    System.out.println("Vehicle: " + vehicle + ", Entry Time: " + entryTime + ", Exit Time: " + exitTime + ", Total Time : " + hoursParked + ", Amount Charged : $" + amountToCharge);
+                }
+            }
+        }
+    }
 }
 
