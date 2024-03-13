@@ -1,4 +1,7 @@
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -360,5 +363,30 @@ public class ParkingLot {
         }
     }
 
+    public List<Vehicles> getVehiclesList() {
+        List<Vehicles> vehiclesList = new ArrayList<>();
+        for (Spot spot : spots) {
+            if (spot.getVehicle() != null) {
+                vehiclesList.add(spot.getVehicle());
+            }
+        }
+        return vehiclesList;
+    }
+
+    public void closeParking() {
+        List<Vehicles> vehiclesList = getVehiclesList();
+        for (Vehicles vehicle : vehiclesList) {
+            if (vehicle != null) {
+                LocalDateTime entryTime = getEntryTimeFromVehicleFlow(vehicle);
+                if (entryTime != null) {
+                    LocalDateTime exitTime = LocalDateTime.now();
+                    long hoursParked = ChronoUnit.HOURS.between(entryTime, exitTime);
+                    double hourlyRate = vehicle.getAmountCharged();
+                    double amountToCharge = hoursParked * hourlyRate;
+                    System.out.println("Vehicle: " + vehicle + ", Entry Time: " + entryTime + ", Exit Time: " + exitTime + ", Total Time : " + hoursParked + ", Amount Charged : $" + amountToCharge);
+                }
+            }
+        }
+    }
 }
 
