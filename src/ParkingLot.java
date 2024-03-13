@@ -372,7 +372,7 @@ public class ParkingLot {
         }
         return vehiclesList;
     }
-
+    
     public void closeParking() {
         List<Vehicles> vehiclesList = getVehiclesList();
         for (Vehicles vehicle : vehiclesList) {
@@ -380,10 +380,12 @@ public class ParkingLot {
                 LocalDateTime entryTime = getEntryTimeFromVehicleFlow(vehicle);
                 if (entryTime != null) {
                     LocalDateTime exitTime = LocalDateTime.now();
-                    long hoursParked = ChronoUnit.HOURS.between(entryTime, exitTime);
+                    long totalMinutes = ChronoUnit.MINUTES.between(entryTime, exitTime);
+                    double hoursParked = (double) totalMinutes / 60;
                     double hourlyRate = vehicle.getAmountCharged();
                     double amountToCharge = hoursParked * hourlyRate;
-                    System.out.println("Vehicle: " + vehicle + ", Entry Time: " + entryTime + ", Exit Time: " + exitTime + ", Total Time : " + hoursParked + ", Amount Charged : $" + amountToCharge);
+                    String formattedHours = String.format("%.1f", hoursParked);
+                    System.out.println("Vehicle: " + vehicle + ", Entry Time: " + entryTime + ", Exit Time: " + exitTime + ", Total Time : " + formattedHours + " hours, Amount Charged : $" + amountToCharge);
                 }
             }
         }
