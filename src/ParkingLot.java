@@ -170,7 +170,6 @@ public class ParkingLot {
             for (int i = 0; i < 20; i++) { // Search for an empty spot in i = 0 to i = 19
                 if (!spots[i].isOccupied()) { // If the spot is not occupied
                     if (i % 10 + spotsNeeded <= 10) { // If the vehicle fits in the same row
-                        System.out.println("i % 10: " + i % 10 + " spotsNeeded: " + spotsNeeded);
                         return i; // Returns the first empty spot
                     }
                 }
@@ -180,7 +179,6 @@ public class ParkingLot {
             for (int i = 20; i < 25; i++) { // Search for an empty spot in i = 20 to i = 24
                 if (!spots[i].isOccupied()) { // If the spot is not occupied
                     if (spotsNeeded <= 5) { // If i + spotsNeeded fits in the same row
-                        System.out.println("i: " + i + " spotsNeeded: " + spotsNeeded);
                         return i; // Returns the first empty spot
                     }
 
