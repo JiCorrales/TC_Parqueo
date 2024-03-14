@@ -32,10 +32,12 @@ public class ParkingLot {
             String plateOrDescription = askForPlateOrDescription(vehicleType);// Asks for the plate or description
             if (plateOrDescription != null) { // If the plate or description is valid
                 Vehicles newVehicle = createVehicle(vehicleType, plateOrDescription);// Creates the vehicle
-                if (askAndAssignEntryDate(newVehicle)) {
-                    System.out.println("Vehículo agregado al parqueo."); // Prints a message if the vehicle was assigned to a spot
-                } else {
-                    System.out.println("No hay espacio disponible para este tipo de vehículo."); // Prints a message if the vehicle was not assigned to a spot
+                if (!checkDuplicatePlate(newVehicle.getPlate(), vehicleType)) {
+                    if (askAndAssignEntryDateSpot(newVehicle)) {
+                        System.out.println("Vehículo agregado al parqueo."); // Prints a message if the vehicle was assigned to a spot
+                    } else {
+                        System.out.println("No hay espacio disponible para este tipo de vehículo."); // Prints a message if the vehicle was not assigned to a spot
+                    }
                 }
             }
         }
@@ -69,33 +71,49 @@ public class ParkingLot {
                 plateOrDescription = scanner.nextLine();
                 if (!Validations.validPlate(plateOrDescription)) {
                     System.out.println("Placa inválida. Por favor, ingrese una placa válida.");
-                    plateOrDescription = null; // Reiniciamos la variable para evitar problemas
+                    plateOrDescription = null;
                 } else { //It checks if the plate is duplicated
-                    if (checkDuplicatePlate(plateOrDescription)) {
-                        System.out.println("¡Atención! Ya existe un vehículo con esta placa en el parqueo. Por favor, ingrese una placa diferente.");
-                        plateOrDescription = null; // Reiniciamos la variable para evitar problemas
+                    if (checkDuplicatePlate(plateOrDescription, vehicleType)) {
+                        plateOrDescription = null;
                     }
                 }
             }
         } while (plateOrDescription == null);
 
-        return plateOrDescription; // Si la placa o la descripción son válidas, se retorna
+        return plateOrDescription; // Returns the plate or description
     }
-    public boolean checkDuplicatePlate(String plate) {
-        // Method to check if the plate is duplicated
+    public boolean checkDuplicatePlate(String plate, String vehicleType) {
+        if (vehicleType.equalsIgnoreCase("bicicleta")) {
+            return false; // If the vehicle is a bicycle, it does not check for duplicate plates
+        }
+        // Verifies if the vehicle is already in the parking lot
         for (Spot spot : spots) {
-            Vehicles vehicle = spot.getVehicle();
-            // If the vehicle has the same plate, it returns true
-            if (vehicle != null && vehicle.getPlate() != null && vehicle.getPlate().equalsIgnoreCase(plate)) {
-                return true;
+            if (spot != null) { // Check if the spot is not null
+                Vehicles vehicle = spot.getVehicle(); // Gets the vehicle from the spot
+                if (vehicle != null) { // Check if the vehicle is not null
+                    if (vehicle.getPlate().equalsIgnoreCase(plate)) { // Compare plates to check if the vehicle is already in the parking lot
+                        if (!vehicle.getType().equalsIgnoreCase(vehicleType)) { // If the vehicle is not the same type
+                            System.out.println("¡Atención! Ya existe un vehículo con la misma placa pero de diferente tipo en el parqueo. No se puede agregar el nuevo vehículo.");
+                        } else {
+                            System.out.println("¡Atención! Ya existe un vehículo con esta placa en el parqueo. Por favor, ingrese una placa diferente.");
+                        }
+                        return true;
+                    }
+                }
             }
         }
-        return false; // Returns false if the plate is not duplicated
+
+        // Si el vehículo no está en el parqueo, se verifica si ya salió
+        for (VehicleFlow flow : vehicleFlow) {
+            if (flow != null && flow.getVehicle() != null && flow.getVehicle().getPlate().equalsIgnoreCase(plate)  && flow.getVehicle().getType().equalsIgnoreCase(vehicleType) && flow.getExitDateTime() != null) {return false;
+            }
+        }
+        return false; // Si no se encontró ningún vehículo con la misma placa, se permite ingresar
     }
     private Vehicles createVehicle(String vehicleType, String plateOrDescription) {
         return new Vehicles(vehicleType, plateOrDescription);
     }
-    private boolean askAndAssignEntryDate(Vehicles vehicle) {
+    private boolean askAndAssignEntryDateSpot(Vehicles vehicle) {
         String entryDate; // Variable to store the entry date
         do entryDate = askForEntryDate(); // Asks for the entry date
         while (!isValidDateTime(entryDate)); // While the entry date is not valid, it keeps asking for the entry date
@@ -122,6 +140,7 @@ public class ParkingLot {
     public boolean assignSpot(Vehicles vehicle, String entryDate) {
         int spotsNeeded = vehicle.getSpotsNeeded(); // Gets the amount of spots needed for the vehicle
         String vehicleType = vehicle.getType();  // Gets the next empty spot
+
         int startSpot = nextEmptySpot(spotsNeeded, vehicleType); // Gets the next empty spot
         if (startSpot != -1 && isValidPlacement(startSpot, spotsNeeded)) { // If there are empty spots and the placement is valid, the vehicle is assigned to the spot
             for (int i = startSpot; i < startSpot + spotsNeeded; i++) {
@@ -149,23 +168,20 @@ public class ParkingLot {
         } else {
             // Search for an empty spot in the first and second rows, for all other vehicles
             for (int i = 0; i < 20; i++) { // Search for an empty spot in i = 0 to i = 19
-                if (i % 10 + spotsNeeded <= 10 && !spots[i].isOccupied()) { // If the vehicle fits in the same row
-                    boolean enoughSpaces = true; // Variable to check if there are enough empty spots for the vehicle
-                    for (int j = i + 1; j < i + spotsNeeded; j++) { // Iterates through the spots to check if there are enough empty spots
-                        if (spots[j].isOccupied()) { // If the spot is occupied, it sets enoughSpaces to false
-                            enoughSpaces = false; // If the spot is occupied, it sets enoughSpaces to false
-                            break; // Breaks the loop
-                        }
-                    }
-                    if (enoughSpaces) { // If there are enough empty spots for the vehicle
+                if (!spots[i].isOccupied()) { // If the spot is not occupied
+                    if (i % 10 + spotsNeeded <= 10) { // If the vehicle fits in the same row
                         return i; // Returns the first empty spot
                     }
                 }
             }
+
             // If there are no empty spots in the first and second rows, search for empty spots in the third row
             for (int i = 20; i < 24; i++) { // Search for an empty spot in i = 20 to i = 24
                 if (!spots[i].isOccupied()) { // If the spot is not occupied
-                    return i; // Returns the first empty spot
+                    if (i % 5 + spotsNeeded <= 5) { // If i + spotsNeeded fits in the same row
+                        return i; // Returns the first empty spot
+                    }
+
                 }
             }
             return -1; // No empty spots for the vehicle
@@ -267,12 +283,17 @@ public class ParkingLot {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Ingrese la placa del vehículo a sacar: ");
         String plate = scanner.nextLine();
-        Vehicles vehicle = searchVehicleByPlate(plate);
-        if (vehicle != null) {
-            removeVehicle(vehicle);
-            System.out.println("Vehículo sacado del parqueo.");
+        if (Validations.validPlate(plate)){
+                Vehicles vehicle = searchVehicleByPlate(plate);
+            if (vehicle != null) {
+                removeVehicle(vehicle);
+                System.out.println("Vehículo sacado del parqueo.");
+            } else {
+                System.out.println("Vehículo no encontrado.");
+            }
         } else {
-            System.out.println("Vehículo no encontrado.");
+            System.out.println("Placa inválida. Volviendo al menú principal.");
+
         }
     }
     private Vehicles searchVehicleByPlate(String plate) {
@@ -357,9 +378,9 @@ public class ParkingLot {
      */
     public void printAllVehicleFlow() {
         System.out.println("Historial de vehículos:");
-        for (VehicleFlow flow : this.vehicleFlow) {
+        for (VehicleFlow flow : this.vehicleFlow) { // Iterates through the vehicle flow
             if (flow != null) {
-                System.out.println(flow);
+                System.out.println(flow); // Prints the vehicle flow
             }
         }
     }
@@ -370,7 +391,7 @@ public class ParkingLot {
      */
     public void closeParking() {
         System.out.println("Cerrando el parqueo.");
-        exitAllVehicles();
+        exitAllVehicles(); // Exits all the vehicles
         System.out.println("El monto total cobrado es: $" + calculateTotalAmountCharged());
         System.out.println("Cerrando el parqueo.");
     }
@@ -392,7 +413,9 @@ public class ParkingLot {
             return -1;
         }
         int totalAmount;
+        // If the hours passed is a whole number, it multiplies the hours by the hourly rate
         if (hours - Math.floor(hours) >= 0.5) totalAmount = (int) Math.ceil(hours) * hourlyRate;
+        // Else, it multiplies the hours by the hourly rate and adds half of the hourly rate
         else totalAmount = (int) Math.floor(hours) * hourlyRate + hourlyRate / 2;
         return totalAmount;
     }
