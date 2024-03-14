@@ -170,15 +170,17 @@ public class ParkingLot {
             for (int i = 0; i < 20; i++) { // Search for an empty spot in i = 0 to i = 19
                 if (!spots[i].isOccupied()) { // If the spot is not occupied
                     if (i % 10 + spotsNeeded <= 10) { // If the vehicle fits in the same row
+                        System.out.println("i % 10: " + i % 10 + " spotsNeeded: " + spotsNeeded);
                         return i; // Returns the first empty spot
                     }
                 }
             }
 
             // If there are no empty spots in the first and second rows, search for empty spots in the third row
-            for (int i = 20; i < 24; i++) { // Search for an empty spot in i = 20 to i = 24
+            for (int i = 20; i < 25; i++) { // Search for an empty spot in i = 20 to i = 24
                 if (!spots[i].isOccupied()) { // If the spot is not occupied
-                    if (i % 5 + spotsNeeded <= 5) { // If i + spotsNeeded fits in the same row
+                    if (spotsNeeded <= 5) { // If i + spotsNeeded fits in the same row
+                        System.out.println("i: " + i + " spotsNeeded: " + spotsNeeded);
                         return i; // Returns the first empty spot
                     }
 
@@ -325,16 +327,19 @@ public class ParkingLot {
         }
     }
     public void removeVehicle(Vehicles vehicle) {
+        int index = 1;
         for (VehicleFlow flow : vehicleFlow) { // Iterates through the vehicle flow
             if (flow != null && flow.getVehicle().equals(vehicle)) { // If the vehicle is found
                 flow.setExitDateTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))); // Sets the exit date and time
-                System.out.println("Sacando el vehículo Vehículo: " + vehicle); // Prints the vehicle
+                System.out.println(index + "."+ " Sacando el Vehículo:" + "\n" + vehicle); // Prints the vehicle
                 // Prints the entry date, exit date, hours passed, and amount to charge
-                System.out.println(" Hora Entrada: " + flow.getEntryDate() + ", Hora Salida: " + flow.getExitDateTime()
+                System.out.println("Datos: Hora Entrada: " + flow.getEntryDate() + ", Hora Salida: " + flow.getExitDateTime()
                         + ", Horas transcurridas: " + String.format("%.1f", flow.calculateHoursPassed())
                         + ", Monto a cobrar: $" + amountToCharge(flow.calculateHoursPassed(), flow));
+                System.out.println("Vehículo sacado del parqueo." + "\n");
                 break;
             }
+            index++;
         }
         for (Spot spot : spots) { // Iterates through the spots
             if (spot.getVehicle() != null && spot.getVehicle().equals(vehicle)) { // If the vehicle is found
@@ -393,7 +398,7 @@ public class ParkingLot {
         System.out.println("Cerrando el parqueo.");
         exitAllVehicles(); // Exits all the vehicles
         System.out.println("El monto total cobrado es: $" + calculateTotalAmountCharged());
-        System.out.println("Cerrando el parqueo.");
+        System.out.println("El parqueo ha sido cerrado. ¡Hasta luego!");
     }
     public void exitAllVehicles() { // Iterates through the spots and removes the vehicles
         for (Spot spot : spots)
