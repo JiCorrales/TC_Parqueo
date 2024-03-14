@@ -45,6 +45,7 @@ public class Menu {
                         break;
                     case 6:
                         System.out.println("Cierre del día");
+                        parkingLot.closeParking();
                         break;
                     case 7:
                         System.out.println("Saliendo...");

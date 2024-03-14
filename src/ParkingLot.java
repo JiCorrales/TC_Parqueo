@@ -1,4 +1,5 @@
 import java.time.LocalDateTime;
+
 import java.util.Scanner;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -174,9 +175,6 @@ public class ParkingLot {
         System.arraycopy(matchingVehicles, 0, result, 0, count);
         return result;
     }
-
-
-    // exitVehicle method needs work
     public void exitVehicle() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("¿Desea sacar un vehículo por placa o por campo?");
@@ -192,7 +190,6 @@ public class ParkingLot {
             System.out.println("Opción inválida. Volviendo al menú principal.");
         }
     }
-
     public void exitVehicleByPlate() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Ingrese la placa del vehículo a sacar: ");
@@ -321,47 +318,50 @@ public class ParkingLot {
         }
     }
     public void removeVehicle(Vehicles vehicle) {
-        for (VehicleFlow flow : vehicleFlow) {
-            if (flow != null && flow.getVehicle().equals(vehicle)) {
-                flow.setExitDateTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
-                System.out.println("Vehículo: " + vehicle + ", Hora Entrada: " + flow.getEntryDate() + ", Hora Salida: " + flow.getExitDateTime() + ", Horas transcurridas: " + String.format("%.1f", flow.calculateHoursPassed()) + ", Monto a cobrar: $" + amountToCharge(flow.calculateHoursPassed(), flow));
+        for (VehicleFlow flow : vehicleFlow) { // Iterates through the vehicle flow
+            if (flow != null && flow.getVehicle().equals(vehicle)) { // If the vehicle is found
+                flow.setExitDateTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))); // Sets the exit date and time
+                System.out.println("Sacando el vehículo Vehículo: " + vehicle);
+                System.out.println(" Hora Entrada: " + flow.getEntryDate() + ", Hora Salida: " + flow.getExitDateTime()
+                        + ", Horas transcurridas: " + String.format("%.1f", flow.calculateHoursPassed())
+                        + ", Monto a cobrar: $" + amountToCharge(flow.calculateHoursPassed(), flow));
                 break;
             }
         }
-        for (Spot spot : spots) {
-            if (spot.getVehicle() != null && spot.getVehicle().equals(vehicle)) {
-                spot.setOccupied(false);
-                spot.setVehicle(null);
+        for (Spot spot : spots) { // Iterates through the spots
+            if (spot.getVehicle() != null && spot.getVehicle().equals(vehicle)) { // If the vehicle is found
+                spot.setOccupied(false); // Sets the spot as unoccupied
+                spot.setVehicle(null); // Removes the vehicle from the spot
             }
         }
     }
+
     public int amountToCharge(double hours, VehicleFlow vehicleFlow) {
         Vehicles vehicle = vehicleFlow.getVehicle(); // Obtener el vehículo asociado a este flujo
         int hourlyRate = vehicle.getAmountCharged(); // Obtener la tarifa por hora del vehículo
-        System.out.println("Tarifa por hora: " + hourlyRate);
         if (hourlyRate == -1) {
             // Tipo de vehículo no válido
             return -1;
         }
-
-        // Calcular las horas completas y la fracción de horas
-        int fullHours = (int) Math.floor(hours);
-        double fractionOfHour = hours - fullHours;
-        System.out.println("Horas completas: " + fullHours);
-        System.out.println("Fracción de hora: " + fractionOfHour);
         // Calcular el monto a cobrar
-        int totalAmount = 0;
-
-        // Si la fracción de horas es menor o igual a 0.5, se cobrará la mitad de la tarifa por hora
-        if (fractionOfHour <= 0.5) {
-            totalAmount = (int) Math.ceil(hours) * (hourlyRate / 2);
-            System.out.println("Monto a cobrar: " + totalAmount);
-        } else {
-            // Si la fracción de horas es mayor que 0.5, se redondea al próximo número entero y se cobra la tarifa completa
+        int totalAmount;
+        // Si la fracción de horas es mayor que 0.5, se redondea al siguiente número entero
+        if (hours - Math.floor(hours) >= 0.5) {
             totalAmount = (int) Math.ceil(hours) * hourlyRate;
-
+        } else {
+            totalAmount = (int) Math.floor(hours) * hourlyRate + hourlyRate / 2;
         }
-
+        return totalAmount;
+    }
+    public double calculateTotalAmountCharged() {
+        double totalAmount = 0;
+        for (VehicleFlow flow : vehicleFlow) {
+            if (flow != null) {
+                double hours = flow.calculateHoursPassed();
+                int amount = amountToCharge(hours, flow);
+                totalAmount += amount;
+            }
+        }
         return totalAmount;
     }
     public void printAllVehicleFlow() {
@@ -371,47 +371,19 @@ public class ParkingLot {
             }
         }
     }
-
-    public List<Vehicles> getVehiclesList() {
-        List<Vehicles> vehiclesList = new ArrayList<>();
+    public void exitAllVehicles(){ // Iterates through the spots and removes the vehicles
         for (Spot spot : spots) {
             if (spot.getVehicle() != null) {
-                vehiclesList.add(spot.getVehicle());
+                removeVehicle(spot.getVehicle()); //
             }
         }
-        return vehiclesList;
+    }
+    public void closeParking(){
+        exitAllVehicles();
+        System.out.println("El monto total cobrado es: $" + calculateTotalAmountCharged());
+        System.out.println("Cerrando el parqueo.");
     }
 
-    public void closeParking() {
-        List<Vehicles> vehiclesList = getVehiclesList();
-        for (Vehicles vehicle : vehiclesList) {
-            if (vehicle != null) {
-                LocalDateTime entryTime = getEntryTimeFromVehicleFlow(vehicle);
-                if (entryTime != null) {
-                    LocalDateTime exitTime = LocalDateTime.now();
-                    long totalMinutes = ChronoUnit.MINUTES.between(entryTime, exitTime);
-                    double hoursParked = (double) totalMinutes / 60;
-                    double hourlyRate = vehicle.getAmountCharged();
-                    double amountToCharge = hoursParked * hourlyRate;
-                    String formattedHours = String.format("%.1f", hoursParked);
-                    System.out.println("Vehicle: " + vehicle + ", Entry Time: " + entryTime + ", Exit Time: " + exitTime + ", Total Time : " + formattedHours + " hours, Amount Charged : $" + amountToCharge);
-                }
-            }
-        }
-    }
-    public void closeParking(Vehicles[] vehicles) {
-        for (Vehicles vehicle : vehicles) {
-            if (vehicle != null) {
-                LocalDateTime entryTime = getEntryTimeFromVehicleFlow(vehicle);
-                if (entryTime != null) {
-                    LocalDateTime exitTime = LocalDateTime.now();
-                    long hoursParked = ChronoUnit.HOURS.between(entryTime, exitTime);
-                    double hourlyRate = vehicle.getAmountCharged();
-                    double amountToCharge = hoursParked * hourlyRate;
-                    System.out.println("Vehicle: " + vehicle + ", Entry Time: " + entryTime + ", Exit Time: " + exitTime + ", Total Time : " + hoursParked + ", Amount Charged : $" + amountToCharge);
-                }
-            }
-        }
-    }
+
 }
 
