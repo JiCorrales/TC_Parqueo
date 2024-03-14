@@ -1,9 +1,11 @@
 import java.util.Scanner;
 
 public class Menu {
-    public ParkingLot parkingLot;
+    public ParkingLot parkingLot; // Create a ParkingLot object
 
-    public Menu() { parkingLot = new ParkingLot(); }
+    public Menu() { parkingLot = new ParkingLot(); } // Constructor
+
+    // Method to print the menu options
     private void printMenu() {
         System.out.println("---- Menú ----");
         System.out.println("1. Ingresar vehículo");
@@ -18,50 +20,27 @@ public class Menu {
 
     public void run() {
         Scanner scanner = new Scanner(System.in); // Create a Scanner object
-        int option; // Variable to store the selected option
-        do { // Loop to keep the menu running
-            printMenu();
-            // Check if the input is an integer
-            if (scanner.hasNextInt()) {
-                option = scanner.nextInt();
-                switch (option) {
-                    case 1:
-                        // Call the addVehicle method
-                        parkingLot.addVehicle();
-                        break;
-                    case 2:
-                        // Call the searchForVehicle methodparkingLot.searchForVehicle();
-                        parkingLot.searchForVehicle();
-                        break;
-                    case 3:
-                        parkingLot.exitVehicle();
-                        break;
-                    case 4:
-                        System.out.println(parkingLot.toString());
-                        break;
-                    case 5:
-                        System.out.println("Consultar historial");
-                        parkingLot.printAllVehicleFlow();
-                        break;
-                    case 6:
-                        System.out.println("Cierre del día");
-                        parkingLot.closeParking();
-                        break;
-                    case 7:
-                        System.out.println("Saliendo...");
-                        break;
-                    default:
-                        System.out.println("Opción inválida");
-                        break;
+        int option; // Variable to store the user's option
+        do { // Start a do-while loop
+            printMenu(); // Print the menu options
+            if (scanner.hasNextInt()) { // Check if the user's input is an integer
+                option = scanner.nextInt(); // Read the user's input
+                switch (option) { // Check the user's input
+                    case 1 -> parkingLot.addVehicle(); // Add a vehicle
+                    case 2 -> parkingLot.searchForVehicle(); // Search for a vehicle
+                    case 3 -> parkingLot.exitVehicle(); // Remove a vehicle
+                    case 4 -> System.out.println(parkingLot.toString()); // Print the parking lot status
+                    case 5 -> parkingLot.printAllVehicleFlow(); // Print the vehicle flow
+                    case 6 -> parkingLot.closeParking(); // Close the parking lot
+                    case 7 -> parkingLot.exitSystem(); // Exit the system
+                    default -> System.out.println("Opción inválida"); // Print an error message
                 }
             } else {
-                // Cleans the buffer
-                scanner.next();
-                System.out.println("Por favor, ingrese un número válido.");
-                option = 0; // Set the option to 0 to keep the loop running
+                scanner.next(); // Clear the scanner buffer
+                System.out.println("Por favor, ingrese un número válido."); // Print an error message
+                option = 0; // Set the option to 0
             }
-        } while (option != 7);
-        scanner.close();
+        } while (option != 7); // Repeat the loop until the user selects the option to exit the system
+        scanner.close(); // Close the scanner
     }
-
 }

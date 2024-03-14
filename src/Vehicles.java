@@ -1,12 +1,10 @@
 
 public class Vehicles {
-    private String type;
-    private String plate;
-    private String description;
-    private int spotsNeeded;
-    private int amountCharged;
-
-
+    private String type; // The type of vehicle
+    private String plate; // The license plate of the vehicle
+    private String description; // The description of the vehicle
+    private final int spotsNeeded; // The number of spots needed by the vehicle
+    private final int amountCharged; // The base amount charged to the vehicle
     public Vehicles(String type, String plateOrDescription) {
         this.type = type;
         if (type.equals("bicicleta")){
@@ -26,110 +24,49 @@ public class Vehicles {
             return "Tipo: " + type + ", Placa: " + plate + ", Espacios: " + spotsNeeded + ", Cobro Base:[$" + amountCharged + "]";
         }
     }
-
-
     public String getDescription() {
         return description;
-    }
+    } // Get the description of the vehicle
 
     public String getType() {
         return type;
-    }
-
+    } // Get the type of vehicle
     public String getPlate() {
         return plate;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public void setPlate(String plate) {
-        this.plate = plate;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
+    } // Get the license plate of the vehicle
     public int getSpotsNeeded() {
         return spotsNeeded;
-    }
-
-
-    // Method to validate the vehicle type
-    public  static boolean validType(String vehicleType) {
-        // The vehicle type must be one of the following
-        String[] validVehicleTypes = {"liviano", "mediano", "largo", "microbus", "bus", "motocicleta", "bicicleta"};
-        // Iterates through the valid vehicle types and returns true if the vehicle type is valid
-        for (String validVehicleType : validVehicleTypes) {
-            if (vehicleType.equals(validVehicleType)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    // Method to get the amount charged
-    // This should be modified to return the amount charged based on the vehicle type and
-    // the time the vehicle was parked
+    } // Get the number of spots needed by the vehicle
+    /*
+     * Method to get the amount charged to the vehicle
+     */
     public int getAmountCharged() {
-        switch (type) {
-            case "motocicleta":
-            case "bicicleta":
-                return 800;
-            case "liviano":
-                return 1000;
-            case "mediano":
-                return 2000;
-            case "largo":
-                return 3000;
-            case "microbus":
-                return 4000;
-            case "bus":
-                return 5000;
-
-            default:
-                return -1;
-        }
+        return switch (type) {
+            case "motocicleta", "bicicleta" -> 800;
+            case "liviano" -> 1000;
+            case "mediano" -> 2000;
+            case "largo" -> 3000;
+            case "microbus" -> 4000;
+            case "bus" -> 5000;
+            default -> -1;
+        };
     }
-
-
+    /*
+     * Method to get the number of spots needed by the vehicle
+     */
     public int spotsNeeded() {
-        switch (type) {
-            case "liviano":
-            case "motocicleta":
-            case "bicicleta":
-                return 1;
-            case "mediano":
-                return 2;
-            case "largo":
-                return 3;
-            case "microbus":
-                return 4;
-            case "bus":
-                return 5;
-
-            default:
-                return -1;
-        }
+        return switch (type) {
+            case "liviano", "motocicleta", "bicicleta" -> 1;
+            case "mediano" -> 2;
+            case "largo" -> 3;
+            case "microbus" -> 4;
+            case "bus" -> 5;
+            default -> -1;
+        };
     }
-    // Method to validate the license plate
-    // This could be modified in order to be more specific, like
-    // checking that the first 3 characters are letters and the last 3 are digits
-    public static boolean validPlate(String plate) {
-        // The plate must have 6 characters
-        if (plate.length() != 6) {
-            return false;
-        }
-        // The first 6 characters must be digits
-        for (char c : plate.toCharArray()) {
-            if (!Character.isLetterOrDigit(c)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
+    /*
+     * Method to get the license plate or the description of the vehicle
+     */
     public String getPlateOrDescription() {
         if (type.equals("bicicleta")) {
             return description;
