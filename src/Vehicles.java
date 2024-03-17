@@ -21,7 +21,7 @@ public class Vehicles {
         if (type.equals("bicicleta")) {
             return "Tipo: " + type + ", Descripción: " + description + ", Espacios: " + spotsNeeded + ", Cobro Base:[$" + amountCharged + "]";
         } else {
-            return "Tipo: " + type + ", Placa: " + plate + ", Espacios: " + spotsNeeded + ", Cobro Base:[$" + amountCharged + "]";
+            return "Tipo: " + type + ", Placa: " + plate + ", Espacios: " + spotsNeeded + ", Cobro Base:[$" + amountCharged + "]" ;
         }
     }
     public String getDescription() {

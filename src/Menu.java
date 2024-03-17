@@ -22,7 +22,7 @@ public class Menu {
         Scanner scanner = new Scanner(System.in); // Create a Scanner object
         int option; // Variable to store the user's option
         do { // Start a do-while loop
-            printMenu(); // Print the menu options
+            printMenu(); // Print the menu options1
             if (scanner.hasNextInt()) { // Check if the user's input is an integer
                 option = scanner.nextInt(); // Read the user's input
                 switch (option) { // Check the user's input
@@ -30,7 +30,7 @@ public class Menu {
                     case 2 -> parkingLot.searchForVehicle(); // Search for a vehicle
                     case 3 -> parkingLot.exitVehicle(); // Remove a vehicle
                     case 4 -> System.out.println(parkingLot.toString()); // Print the parking lot status
-                    case 5 -> parkingLot.printAllVehicleFlow(); // Print the vehicle flow
+                    case 5 -> parkingLot.seeFlows(); // Let the user see the vehicle flows, by vehicle and all the flows
                     case 6 -> parkingLot.closeParking(); // Close the parking lot
                     case 7 -> parkingLot.exitSystem(); // Exit the system
                     default -> System.out.println("Opción inválida"); // Print an error message
