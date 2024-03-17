@@ -1,5 +1,4 @@
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.Scanner;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -18,15 +17,10 @@ public class ParkingLot {
             spots[i] = new Spot();
         }
     }
-
-
-
-
-
     /*
      * 03/17/2024 - 05:17 AM
      * Here I realized we are doing some dumb things
-     * Why are we creating a new vehicle with the values we are asking for? We should be looking for an existing vehicle.
+     * Why are we creating a new vehicle with the same values? We should be looking for an existing vehicle.
      * If there is a vehicle with the same plate and type, we should be looking for it in the parking lot
      * and if it's not there, then we add it. So it would be better to create a method to find an existing vehicle.
      * There is no time to do it now, but I will leave a comment in the code to remember my mistakes a realize this on
@@ -48,7 +42,7 @@ public class ParkingLot {
         return null;
     }
      /* Something like this, but I don't have time to implement it now. Also, we can't look for bicycles with this method.
-     * Because there is no personal information about bicycles, so we can't look for them in the vehicle flow.
+     * Because there is no identifier information about bicycles, so we can't look for them in the vehicle flow.
      * This means that is none sense to ask for the description of the bicycle, because there could be many bicycles
      * with the same description.
      */
@@ -75,9 +69,6 @@ public class ParkingLot {
             }
         }
     }
-
-
-
     private String askForVehicleType() {
         Scanner scanner = new Scanner(System.in);
         String vehicleType;
@@ -85,9 +76,9 @@ public class ParkingLot {
             System.out.println("Ingrese el tipo de vehículo a ingresar (Liviano (1), Mediano (2), Largo (3), Microbus (4), Bus (5), Motocicleta, Bicicleta): ");
             vehicleType = scanner.nextLine().toLowerCase();
             if (vehicleType.isEmpty()) System.out.println("Debe ingresar algo para continuar.");
-            else if (!Validations.validType(vehicleType))
+            else if (!Validations.validType(vehicleType)) // If the vehicle type is not valid
                 System.out.println("Tipo de vehículo inválido. Por favor, ingrese un tipo válido.");
-        } while (vehicleType.isEmpty() || !Validations.validType(vehicleType));
+        } while (vehicleType.isEmpty() || !Validations.validType(vehicleType)); // While the vehicle type is not valid, it keeps asking for the vehicle type
 
         return vehicleType;
     }
@@ -113,26 +104,22 @@ public class ParkingLot {
                     }
                 }
             }
-        } while (plateOrDescription == null);
+        } while (plateOrDescription == null); // While the plate or description is not valid, it keeps asking for the plate or description
 
         return plateOrDescription; // Returns the plate or description
     }
-    public boolean checkDuplicatePlate(String plate, String vehicleType) {
-        boolean foundDuplicatePlate = checkDuplicatePlateInParkingLot(plate, vehicleType);
-
-        if (!foundDuplicatePlate) {
-            foundDuplicatePlate = checkDuplicatePlateWithDifferentType(plate, vehicleType);
-        }
-
-        return foundDuplicatePlate;
+    public boolean checkDuplicatePlate(String plate, String vehicleType) { // Method to check if the plate is duplicated
+        boolean foundDuplicatePlate = checkDuplicatePlateInParkingLot(plate, vehicleType); // Checks if the plate is duplicated in the parking lot
+        if (!foundDuplicatePlate) foundDuplicatePlate = checkDuplicatePlateWithDifferentType(plate, vehicleType); // Checks if the plate is duplicated with a different type
+        return foundDuplicatePlate; // Returns true if the plate is duplicated
     }
-
-    private boolean checkDuplicatePlateInParkingLot(String plate, String vehicleType) {
-        if (!vehicleType.equalsIgnoreCase("bicicleta")) {
-            for (Spot spot : spots) {
-                if (spot != null) {
-                    Vehicles vehicle = spot.getVehicle();
-                    if (vehicle != null && vehicle.getPlate().equalsIgnoreCase(plate)) {
+    // Method to check if the plate is duplicated in the parking lot
+    private boolean checkDuplicatePlateInParkingLot(String plate, String vehicleType) { //
+        if (!vehicleType.equalsIgnoreCase("bicicleta")) { // If the vehicle type is not bicycle
+            for (Spot spot : spots) { // Iterates through the spots
+                if (spot != null) { // If the spot is not null
+                    Vehicles vehicle = spot.getVehicle(); // Gets the vehicle from the spot
+                    if (vehicle != null && vehicle.getPlate().equalsIgnoreCase(plate)) { // If there is a vehicle with the same plate
                         System.out.println("¡Atención! Ya existe un vehículo con esta placa en el parqueo. Por favor, ingrese una placa diferente.");
                         return true;
                     }
@@ -141,9 +128,11 @@ public class ParkingLot {
         }
         return false;
     }
+    // Method to check if the plate is duplicated with a different type
     private boolean checkDuplicatePlateWithDifferentType(String plate, String vehicleType) {
         if (!vehicleType.equalsIgnoreCase("bicicleta")) {
             for (VehicleFlow flow : vehicleFlow) {
+                // If the plate is found in the vehicle flow with a different type and has exited the parking lot already (exit date is not null)
                 if (flow != null && flow.getVehicle() != null && flow.getVehicle().getPlate().equalsIgnoreCase(plate)
                         && flow.getVehicle().getType().equalsIgnoreCase(vehicleType) && flow.getExitDateTime() != null) {
                     System.out.println("¡Atención! Ya existe un vehículo con la misma placa pero de diferente tipo en el parqueo. No se puede agregar el nuevo vehículo.");
@@ -153,12 +142,9 @@ public class ParkingLot {
         }
         return false;
     }
-
     private Vehicles createVehicle(String vehicleType, String plateOrDescription) {
         return new Vehicles(vehicleType, plateOrDescription);
     }
-
-
     private boolean askAndAssignEntryDateSpot(Vehicles vehicle) {
         String entryDate; // Variable to store the entry date
         do entryDate = askForEntryDate(); // Asks for the entry date
@@ -181,21 +167,15 @@ public class ParkingLot {
             return false;
         }
     }
-
-
     public boolean assignSpot(Vehicles vehicle, String entryDate) {
         int spotsNeeded = vehicle.getSpotsNeeded(); // Gets the amount of spots needed for the vehicle
         String type = vehicle.getType();  // Gets the next empty spot
-
-
         int startSpot = nextEmptySpot(spotsNeeded, type); // Gets the next empty spot
         if (startSpot != -1 && isValidPlacement(startSpot, spotsNeeded)) { // If there are empty spots and the placement is valid, the vehicle is assigned to the spot
             for (int i = startSpot; i < startSpot + spotsNeeded; i++) {
                 spots[i].occupySpot(vehicle);
-
             }
             VehicleFlow vehicleFlow = new VehicleFlow(vehicle, entryDate); // Adds the vehicle to the vehicle flow
-
             for (int i = 0; i < this.vehicleFlow.length; i++) {
                 if (this.vehicleFlow[i] == null) {
                     this.vehicleFlow[i] = vehicleFlow;
@@ -227,13 +207,10 @@ public class ParkingLot {
                 int startSpot = row * spotsPerRow; // Start spot for the current row
                 int endSpot = startSpot + spotsPerRow; // End spot for the current row
                 // Check if it's the last row and adjust the end spot
-                if (row == numRows - 1) {
-                    endSpot = startSpot + 5; // The last row only has 5 spots
-                }
+                if (row == numRows - 1) endSpot = startSpot + 5; // The last row only has 5 spots
                 // Check if the current row has enough consecutive empty spots for the vehicle
                 for (int i = startSpot; i <= endSpot - spotsNeeded; i++) {
                     boolean consecutiveSpotsEmpty = true;
-
                     // Check if spotsNeeded consecutive spots are empty
                     for (int j = i; j < i + spotsNeeded; j++) { // Iterate over the spots needed
                         if (spots[j].isOccupied()) { // If the spot is occupied
@@ -242,9 +219,7 @@ public class ParkingLot {
                         }
                     }
                     // If spotsNeeded consecutive spots are empty, return the start spot
-                    if (consecutiveSpotsEmpty) {
-                        return i;
-                    }
+                    if (consecutiveSpotsEmpty) return i;
                 }
             }
         }
@@ -256,14 +231,10 @@ public class ParkingLot {
         int spotsPerRow = 10;
         int endRow = (startSpot + spotsNeeded - 1) / spotsPerRow;
         // Checks if the vehicle is too long to fit in the parking lot
-        if (endRow == 0 && startSpot % spotsPerRow == spotsPerRow - 1) {
-            return false;
-        }
+        if (endRow == 0 && startSpot % spotsPerRow == spotsPerRow - 1) return false;
         // Checks if the vehicle fits in the parking lot
         for (int i = startSpot; i < startSpot + spotsNeeded; i++) {
-            if (i >= spots.length || spots[i].isOccupied()) {
-                return false;
-            }
+            if (i >= spots.length || spots[i].isOccupied()) return false;
         }
         // Checks if the vehicle fits in the same row
         return true;
@@ -347,10 +318,10 @@ public class ParkingLot {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Ingrese la placa del vehículo a sacar: ");
         String plate = scanner.nextLine();
-        if (Validations.validPlate(plate)){
-                Vehicles vehicle = searchVehicleByPlate(plate);
+        if (Validations.validPlate(plate)){ // If the plate is valid
+                Vehicles vehicle = searchVehicleByPlate(plate); // Searches for the vehicle by plate
             if (vehicle != null) {
-                removeVehicle(vehicle);
+                removeVehicle(vehicle); // Removes the vehicle
                 System.out.println("Vehículo sacado del parqueo.");
             } else {
                 System.out.println("Vehículo no encontrado.");
@@ -393,15 +364,10 @@ public class ParkingLot {
         for (VehicleFlow flow : vehicleFlow) { // Iterates through the vehicle flow
             if (flow != null && flow.getVehicle().equals(vehicle)) { // If the vehicle is found
                 flow.setExitDateTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))); // Sets the exit date and time
-                System.out.println(index + "."+ " Sacando el Vehículo:" + "\n" + vehicle); // Prints the vehicle
-                // Prints the entry date, exit date, hours passed, and amount to charge
-                System.out.println("Datos: Hora Entrada: " + flow.getEntryDate() + ", Hora Salida: " + flow.getExitDateTime()
-                        + ", Horas transcurridas: " + String.format("%.1f", flow.calculateHoursPassed())
-                        + ", Monto a cobrar: $" + amountToCharge(flow.calculateHoursPassed(), flow));
-                System.out.println("Vehículo sacado del parqueo." + "\n");
+                removingTheVehicle(vehicle, index, flow); // Removes the vehicle
                 break;
             }
-            index++;
+            index++; // Increases the index
         }
         for (Spot spot : spots) { // Iterates through the spots
             if (spot.getVehicle() != null && spot.getVehicle().equals(vehicle)) { // If the vehicle is found
@@ -410,7 +376,14 @@ public class ParkingLot {
             }
         }
     }
-
+    public void removingTheVehicle (Vehicles vehicle, int index, VehicleFlow flow) {
+        System.out.println(index + "."+ " Sacando el Vehículo:" + "\n" + vehicle); // Prints the vehicle
+        // Prints the entry date, exit date, hours passed, and amount to charge
+        System.out.println("Datos: Hora Entrada: " + flow.getEntryDate() + ", Hora Salida: " + flow.getExitDateTime()
+                + ", Horas transcurridas: " + String.format("%.1f", flow.calculateHoursPassed())
+                + ", Monto a cobrar: $" + amountToCharge(flow.calculateHoursPassed(), flow));
+        System.out.println("Vehículo sacado del parqueo." + "\n");
+    }
     /*
      * Fourth option in the menu.
      * Method to print the parking lot.
@@ -422,20 +395,16 @@ public class ParkingLot {
         int spotsPerRow = 10;
         // Iterates through the spots and adds them to the string
         for (int i = 0; i < 20; i++) {
-            strValue += (i + 1) + ". " + spots[i].toString() + "\n";
-            if ((i + 1) % spotsPerRow == 0 && i != spots.length - 1) {
+            strValue += (i + 1) + ". " + spots[i].toString() + "\n"; // Adds the spot to the string
+            if ((i + 1) % spotsPerRow == 0 && i != spots.length - 1) { // If it's the end of a row
                 strValue += "-----------------\n"; // Separator between rows
             }
         }
         for (int i = 20; i < 35; i++) {
-            if (i <= 24) {
-                strValue += (i + 1) + ". " + spots[i].toString() + "\n";
-            } else {
-                strValue += "M" + (i - 24) + ". " + spots[i].toString() + "\n";
-            }
-            if ((i + 1) % 35 == 0) {
-                strValue += "-----------------\n"; // Separator between rows
-            }
+            if (i <= 24) strValue += (i + 1) + ". " + spots[i].toString() + "\n"; // Adds the spot to the string
+            else strValue += "M" + (i - 24) + ". " + spots[i].toString() + "\n"; // Adds the spot to the string
+            // If it's the end of a row
+            if (((i + 1) % 35) == 0) strValue += "-----------------\n"; // Separator between rows
         }
         return strValue;
     }
@@ -491,7 +460,6 @@ public class ParkingLot {
             }
         }
     }
-
     /*
      * Sixth option in the menu.
      * Method to close the parking lot.
@@ -509,8 +477,6 @@ public class ParkingLot {
             if (spot.getVehicle() != null)
                 removeVehicle(spot.getVehicle()); // If the spot is occupied, it removes the vehicle
     }
-
-
     /*
      * Start of money related methods
      *
@@ -518,9 +484,7 @@ public class ParkingLot {
     public static int amountToCharge(double hours, VehicleFlow vehicleFlow) {
         Vehicles vehicle = vehicleFlow.getVehicle(); // Gets the vehicle from the vehicle flow
         int hourlyRate = vehicle.getAmountCharged(); // Gets the amount charged for the vehicle
-        if (hourlyRate == -1) {
-            return -1;
-        }
+        if (hourlyRate == -1) return -1;
         int totalAmount;
         // If the hours passed is a whole number, it multiplies the hours by the hourly rate
         if (hours - Math.floor(hours) >= 0.5) totalAmount = (int) Math.ceil(hours) * hourlyRate;
