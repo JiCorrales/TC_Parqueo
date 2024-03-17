@@ -17,7 +17,6 @@ public class Menu {
         System.out.println("7. Salir");
         System.out.print("Ingrese su opción: ");
     }
-
     public void run() {
         Scanner scanner = new Scanner(System.in); // Create a Scanner object
         int option; // Variable to store the user's option
