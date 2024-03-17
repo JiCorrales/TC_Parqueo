@@ -6,16 +6,19 @@ public class VehicleFlow {
     private final Vehicles vehicle;
     private final String entryDateTime; // String for storing the date and time of entry in the desired format
     private String exitDateTime = "El vehículo no ha salido"; // String for storing the date and time of exit in the desired format
+
     // Constructor
     public VehicleFlow(Vehicles vehicle, String entryDateTime) {
         this.vehicle = vehicle;
         this.entryDateTime = entryDateTime;
     }
+
     public VehicleFlow(Vehicles vehicle) {
         this.vehicle = vehicle;
         this.entryDateTime = getEntryDate();
 
     }
+
     // Overridden toString method
     // This method should return a string with the vehicle flow information
     @Override
@@ -23,7 +26,7 @@ public class VehicleFlow {
         double hoursPassed = calculateHoursPassed();
         String hoursPassedString = String.format("%.1f", hoursPassed);
         return "Vehículo: " + vehicle + ", Hora Entrada: " + entryDateTime + ", Horas transcurridas: " +
-                hoursPassedString + ", Hora salida: " + exitDateTime + ", Monto a pagar: $" ;
+                hoursPassedString + ", Hora salida: " + exitDateTime + ", Monto a pagar: $";
     }
 
     public void setExitDateTime(String exitDateTime) {
