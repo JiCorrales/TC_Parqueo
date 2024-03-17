@@ -142,12 +142,9 @@ public class ParkingLot {
         }
         return false;
     }
-
     private Vehicles createVehicle(String vehicleType, String plateOrDescription) {
         return new Vehicles(vehicleType, plateOrDescription);
     }
-
-
     private boolean askAndAssignEntryDateSpot(Vehicles vehicle) {
         String entryDate; // Variable to store the entry date
         do entryDate = askForEntryDate(); // Asks for the entry date
@@ -170,21 +167,15 @@ public class ParkingLot {
             return false;
         }
     }
-
-
     public boolean assignSpot(Vehicles vehicle, String entryDate) {
         int spotsNeeded = vehicle.getSpotsNeeded(); // Gets the amount of spots needed for the vehicle
         String type = vehicle.getType();  // Gets the next empty spot
-
-
         int startSpot = nextEmptySpot(spotsNeeded, type); // Gets the next empty spot
         if (startSpot != -1 && isValidPlacement(startSpot, spotsNeeded)) { // If there are empty spots and the placement is valid, the vehicle is assigned to the spot
             for (int i = startSpot; i < startSpot + spotsNeeded; i++) {
                 spots[i].occupySpot(vehicle);
-
             }
             VehicleFlow vehicleFlow = new VehicleFlow(vehicle, entryDate); // Adds the vehicle to the vehicle flow
-
             for (int i = 0; i < this.vehicleFlow.length; i++) {
                 if (this.vehicleFlow[i] == null) {
                     this.vehicleFlow[i] = vehicleFlow;
